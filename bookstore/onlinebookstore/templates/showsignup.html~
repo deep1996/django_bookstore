@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+
+	<meta charset="utf-8">
+
+	<title>SignUp</title>
+
+	{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'onlinebookstore/loginstyle.css' %}" />
+
+	<!--[if lt IE 9]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+</head>
+
+<body>
+{% block content %}
+&nbsp; &nbsp;
+<header style="margin-top:100px;float:left;">
+<a href="{% url 'home' %}" style="margin-top:10px;color:black;">Home</a>
+</header>
+	<div id="login">
+
+		<h2><span class="fontawesome-lock"></span>Sign UP</h2>
+
+
+		<form  method="POST" class="post-form">
+
+			<fieldset>
+{% if check %}
+  	<h3>Username {{ user }} already used</h3><br>
+	{% endif %}
+        {{ form.as_p }}
+
+				<p><input type="submit" value="Sign Up" class="save btn btn-default"></p>
+
+			</fieldset>
+
+		</form>
+
+	</div> <!-- end login -->
+{% endblock %}
+</body>	
+</html>
+       
+    

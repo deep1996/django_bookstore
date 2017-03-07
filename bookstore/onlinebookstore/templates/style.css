@@ -1,0 +1,26 @@
+body {
+    background-image: url("4f95b40d6088a26.jpg") !important;
+    background-position: center top;
+    background-repeat: no-repeat !important;
+}
+
+
+#header{
+color: white;
+margin-left:180px;
+}
+#content{
+background-color:red;
+padding-top:0px;
+margin-top:-70px;
+margin-left:375px;
+width:745px;
+}
+#footer{
+clear:both;
+color:#999999;
+padding:10px;
+
+
+text-align:center;
+}

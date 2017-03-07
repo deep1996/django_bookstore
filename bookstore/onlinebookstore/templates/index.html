@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>Book Store</title>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'onlinebookstore/style.css' %}" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+</head>
+<body>
+<div id="header">
+<img src="{%  static 'onlinebookstore/readbook.jpg' %}" height="100" width="100" style="float:right;margin-right:50px;margin-top:-19px;">
+<h1>Book Store</h1>
+<div id="signin">
+{% if check %}
+Hi {{ user }}! &nbsp
+<a id="upper" href="{% url "log_out" %}" style="color:yellow">LogOut</a>
+{% else %}
+ 
+<a  id="upper" href="{% url "signup" %}" style="color:yellow">SignUp</a>&nbsp
+<a  id="upper" href="{% url "log_in" %}" style="color:yellow">LogIn</a>
+
+{% endif %}
+
+
+</div>
+</div>
+<div id="sidebar">
+<ul>
+<li><a href="{%url 'home'%}" style="color:#CCFFCC; text-decoration:none;" >Home</a></li>
+<br>
+<li><a href="{%url 'aboutus'%}"style="color:#CC6633; text-decoration:none;">About Us</a></li>
+
+</ul>
+
+</div>
+	
+<br><br>
+
+<div id="search">
+<form method="get" >
+<label for="id_q"><b>Search:</b></label>
+           <input type="text" name="q" id="id_q"/>
+           <input type="Submit" value="Submit"/>
+</form>
+</div>
+<br>
+<br><br>
+<div id="content">
+	
+	{% load staticfiles %}
+	{% for b in print %}
+		<div class="post">
+		<h2>{{ b.0.book_section }}</h2>
+		
+		<div id="design-cast" style="position: relative;overflow: hidden;" >
+		{% for c in b %}
+			<div class="member" style="float: left;width: 31%;margin: 1% 1% 45px 1%;">
+
+		<a {% if check %} href="/pdf/{{ c.book_id }}" {% else %} href="{% url "signup" %}" {% endif %} >	
+ 		<img src='static/{{ c.book_id }}.jpeg' alt="image"  height="200" width="190" style="float:left;" style="width: 100%;display: block;"> 
+
+			<div style="color: #660000 ;"class="name" >{{ c.book_name }}</div></a>
+			</div>
+		{% endfor %}
+		</div>
+		<br><hr><br>
+		</div>
+	{% endfor %}
+
+</div>
+<div id="footer" >
+Created by:Deepanshu
+</div>
+</body>
+</html>

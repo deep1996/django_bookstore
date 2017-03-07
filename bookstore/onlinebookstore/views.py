@@ -1,0 +1,193 @@
+import random
+from django.shortcuts import render_to_response,render
+from django.http import HttpResponseRedirect
+from django.http import HttpResponse
+from models import books
+#from forms import PostForm
+import re
+from django.db.models import Q
+from signform import userform
+from django.contrib.auth import authenticate, login,logout
+from user_log import logged
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.core import validators
+
+def log_out(request):
+    logout(request)
+    home(request)
+    return HttpResponseRedirect('/')   
+
+
+def log_in(request):
+    x=False
+    y=False
+    #if request.method == 'POST':
+    form=logged(request.POST)
+    if form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+		return HttpResponseRedirect('/')
+		    
+            # Redirect to a success page.
+            else:
+		y=True
+            # Return a 'disabled account' error message
+           
+        else:
+	    x=True
+    else:
+        form=logged()
+    return render_to_response( 'login.html', {'form': form,'check1':x,'check2':y})
+        
+
+def signup (request):
+    x=False
+    if request.method == 'POST':
+        form=userform(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+	    email = form.cleaned_data['email']
+	    password = form.cleaned_data['password']
+            if(isValidUsername(username)):
+	        x=True
+		print "hi"
+		return render_to_response( 'showsignup.html', {'form': form,'check':x,'user':username})
+            user = User.objects.create_user(username=username,email=email,password=password,first_name=first_name,last_name=last_name)
+            user.save()
+	    user = authenticate(username=username, password=password)
+            login(request, user)
+            return HttpResponseRedirect('/')
+    else:
+        form=userform()
+    
+    return render_to_response( 'showsignup.html', {'form': form,'check':x})
+
+
+
+def isValidUsername(field_data):
+    try:
+        User.objects.get(username=field_data)
+    except User.DoesNotExist:
+        return False
+    return True
+
+def aboutus(request):
+    user1=''
+    x=False
+    if request.user.is_authenticated():
+	user1=request.user
+	x=True
+    return render_to_response('aboutus.html', {'check':x,'user':user1})
+
+
+def home(request):
+    user1=''
+    x=False
+    if request.user.is_authenticated():
+	user1=request.user
+	x=True
+    a=random.sample([1,2,3,4,5],3)
+    sections=[]
+    book=[]
+    for i in range(0,3):
+        sections.append(books.objects.raw('SELECT book_section,id FROM onlinebookstore_books WHERE book_id=%s',[a[i]]))
+        book.append(books.objects.raw('SELECT * FROM onlinebookstore_books WHERE book_section=%s LIMIT 3',[sections[i][0].book_section]))
+	print sections[i]
+    #sections[0]=books.objects.raw('SELECT section FROM onlinebookstore_books WHERE book_id=%d',[a[0]])
+    #sections[1]=books.objects.raw('SELECT section FROM onlinebookstore_books WHERE book_id=%d',[a[1]])
+    #sections[2]=books.objects.raw('SELECT section FROM onlinebookstore_books WHERE book_id=%d',[a[2]])
+    #book0=books.objects.raw('SELECT * FROM onlinebookstore_books WHERE section=%s',[sections[0]])
+    #book1=books.objects.raw('SELECT * FROM onlinebookstore_books WHERE section=%s',[sections[1]])
+    #book2=books.objects.raw('SELECT * FROM onlinebookstore_books WHERE section=%s',[sections[2]])
+    query_string = ''
+    found_entries = None
+    if ('q' in request.GET) and request.GET['q'].strip():
+	print "hi"
+        query_string = request.GET['q']
+        
+        entry_query = get_query(query_string, ['book_name', 'book_section','book_author'])
+        
+        found_entries = books.objects.filter(entry_query)#.order_by('-pub_date')
+	return HttpResponseRedirect('/search_post?q='+query_string)
+        #return render_to_response('search_result.html',
+        #                  { 'query_string': query_string, 'found_entries': found_entries })
+    print book[0][0].book_section
+    return render_to_response('index.html',{'print':book,'check':x,'user':user1})
+    
+
+
+def search(request):
+    user1=''
+    check=False
+    user1=request.user
+    print "here"
+    if request.user.is_authenticated():
+	check=True
+        print "vnsjkbvksbvkjs"
+    query_string = ''
+    found_entries = None
+    if ('q' in request.GET) and request.GET['q'].strip():
+        query_string = request.GET['q']
+       # search_method(query_string)
+        entry_query = get_query(query_string, ['book_name', 'book_section','book_author'])
+        
+        found_entries = books.objects.filter(entry_query)#.order_by('author')
+
+    return render(request,'search_result.html',
+                          { 'query_string': query_string, 'found_entries': found_entries,'check':check,'user':user1 })
+
+
+
+def normalize_query(query_string,
+                    findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
+                    normspace=re.compile(r'\s{2,}').sub):
+    ''' Splits the query string in invidual keywords, getting rid of unecessary spaces
+        and grouping quoted words together.
+        Example:
+        
+        >>> normalize_query('  some random  words "with   quotes  " and   spaces')
+        ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
+    
+    '''
+    return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)] 
+
+def get_query(query_string, search_fields):
+    ''' Returns a query, that is a combination of Q objects. That combination
+        aims to search keywords within a model by testing the given search fields.
+    
+    '''
+    query = None # Query to search for every search term        
+    terms = normalize_query(query_string)
+    for term in terms:
+        or_query = None # Query to search for a given term in each field
+        for field_name in search_fields:
+            q = Q(**{"%s__icontains" % field_name: term})
+            if or_query is None:
+                or_query = q
+            else:
+                or_query = or_query | q
+        if query is None:
+            query = or_query
+        else:
+            query = query & or_query
+    return query
+
+
+def open_pdf(request,pdf_id):
+    if request.user.is_authenticated():
+        x='onlinebookstore/pdfs/'+pdf_id+'.pdf'
+        with open(x, 'r') as pdf:
+            response = HttpResponse(pdf.read(), content_type='application/pdf')
+            response['Content-Disposition'] = 'inline;filename=a.pdf'
+            return response
+        pdf.closed
+    else:
+        #messages.add_message(request, messages.INFO, 'Log in first')
+        return HttpResponseRedirect('/')

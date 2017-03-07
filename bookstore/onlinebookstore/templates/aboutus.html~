@@ -1,0 +1,52 @@
+<html>
+<head>
+	<title>Book Store</title>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'onlinebookstore/style.css' %}" />
+
+</head>
+<body>
+<div id="header">
+<img src="{%  static 'onlinebookstore/readbook.jpg' %}" height="100" width="100" style="float:right;margin-right:60px;margin-top:-19px;">
+<h1>Book Store</h1>
+<div id="signin">
+{% if check %}
+
+<a id="upper" href="{% url "log_out" %}" style="color:yellow">LogOut</a>
+{% else %}
+ 
+<a  id="upper" href="{% url "signup" %}" style="color:yellow">SignUp</a>&nbsp
+<a  id="upper" href="{% url "log_in" %}" style="color:yellow">LogIn</a>
+
+{% endif %}
+
+</div>
+</div>
+<div id="sidebar">
+<ul>
+<li><a href="{%url 'home'%}" style="color:#CCFFCC; text-decoration:none;">Home</a></li>
+<br>
+<li><a href="{%url 'aboutus'%}"style="color:#CC6633; text-decoration:none;">About Us</a></li>
+
+</ul>
+
+</div>
+	
+<br><br>
+
+
+<br>
+<br><br><BR><BR><br>
+<div id="content">
+<p>Deepanshu Singhal:<BR>Email id:deepanshusinghal@gmail.com<P>
+<p>Divesh Mudgil:<br>Email id:dmudg16@gmail.com<p>
+ 
+
+</div>
+<div id="footer"  style="margin-top:500px;">
+<hr style="width:54%">
+Created by:Deepanshu and Divesh
+</div>
+</body>
+</html>

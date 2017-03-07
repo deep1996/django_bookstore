@@ -1,0 +1,64 @@
+body { 
+    background-image: url("4f95b40d6088a26.jpg") !important;
+    
+    background-position: center top;
+ background-position:absolute;
+ 
+    background-repeat: no-repeat !important;
+ font-family: Rockwell,Courier Bold,Courier,Georgia,Times,Times New Roman,serif;
+
+}
+a{text-decoration:none;}
+ #upper {
+    color: white;
+text-decoration:none;
+}
+#search{margin-top:10px;
+margin-left:40%;
+color:black;
+}
+#sidebar{float:left;
+margin-top:80px;
+margin-left:12%;
+width:20%;
+position:relative;
+
+}
+#sidebar ul{
+text-decoration:none;
+list-style-type:none;
+color:green;
+}
+
+#header{
+color: white;
+
+margin-left:14%;position:relative;
+}
+#content{color:#484848 ;
+text-align:center;
+ text-transform: uppercase;
+background-color:white;
+padding-top:0px;
+width:54%;
+margin-top:-70px;
+margin-left:30%;
+text-decoration:none;
+}
+
+#signin{
+float:right;
+padding-right:180px;
+color:white;
+margin-right:-140px;	
+}
+#member{
+color:black;
+}
+#footer{
+clear:both;
+color:blue;
+padding:10px;
+text-align:center;
+margin-left:280px;
+}
